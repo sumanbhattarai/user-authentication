@@ -1,5 +1,6 @@
 const express = require('express')
 const bycrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 const router = express.Router()
 const User  = require('../models/User')
 
@@ -36,7 +37,8 @@ router.post('/login' , async (req , res)=>{
 
      const validPass = await bycrypt.compare(req.body.password , user.password)
      if(validPass){
-         res.status(200).send('Logged In.')
+         const token = jwt.sign({ _id : user._id} , process.env.TOKEN_SECRET)
+         res.status(200).header('auth-token' , token).send(token)
      } else {
          res.status(400).send('Invalid email or password.')
      }
